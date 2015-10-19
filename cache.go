@@ -94,7 +94,7 @@ func (cache *Cache) expirationNotificationTrigger(item *item) {
 }
 
 // Check doesn't update the TTL when fetching the record
-func (cache *Cache) Check(key string) (*item, bool) {
+func (cache *Cache) Check(key string) (interface{}, bool) {
 	cache.mutex.Lock()
 	defer cache.mutex.Unlock()
 
@@ -102,7 +102,7 @@ func (cache *Cache) Check(key string) (*item, bool) {
 	if !exists || item.expired() {
 		return nil, false
 	}
-	return item, exists
+	return item.data, exists
 }
 
 // Set is a thread-safe way to add new items to the map
