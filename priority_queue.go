@@ -37,41 +37,46 @@ func (pq *priorityQueue) remove(item *item) {
 
 func (pq priorityQueue) Len() int {
 	pq.mutex.Lock()
+	defer pq.mutex.Unlock()
+
 	length := len(pq.items)
-	pq.mutex.Unlock()
 	return length
 }
 
 func (pq priorityQueue) Less(i, j int) bool {
 	pq.mutex.Lock()
+	defer pq.mutex.Unlock()
+
 	less := pq.items[i].expireAt.Before(pq.items[j].expireAt)
-	pq.mutex.Unlock()
 	return less
 }
 
 func (pq priorityQueue) Swap(i, j int) {
 	pq.mutex.Lock()
+	defer pq.mutex.Unlock()
+
 	pq.items[i], pq.items[j] = pq.items[j], pq.items[i]
 	pq.items[i].queueIndex = i
 	pq.items[j].queueIndex = j
-	pq.mutex.Unlock()
 }
 
 func (pq *priorityQueue) Push(x interface{}) {
 	pq.mutex.Lock()
+	defer pq.mutex.Unlock()
+
 	item := x.(*item)
 	item.queueIndex = len(pq.items)
 	pq.items = append(pq.items, item)
-	pq.mutex.Unlock()
 }
 
 func (pq *priorityQueue) Pop() interface{} {
 	pq.mutex.Lock()
+	defer pq.mutex.Unlock()
+
 	old := pq.items
 	n := len(old)
 	item := old[n-1]
 	item.queueIndex = -1
 	pq.items = old[0 : n-1]
-	pq.mutex.Unlock()
 	return item
 }
